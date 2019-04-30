@@ -34,12 +34,27 @@ number_players<-pers_year_long %>%
   group_by(class) %>% select(Player) %>% unique() %>%  
   summarise(n=n())
 
-ui <- navbarPage(inverse = TRUE,
+ui <- tagList(
+  tags$head(tags$style(HTML("
+                            .navbar-nav {
+                            float: none !important;
+                            }
+                            .navbar-nav > li:nth-child(4) {
+                            float: right;
+                            right: 150px;
+                            }
+                            .navbar-nav > li:nth-child(5) {
+                            float: right;
+                            }
+                            "))),
+  navbarPage(inverse = TRUE,
                   "WNBA, NBA and PERs",
                
                   # Second Page  - Compare 
                   tabPanel("Compare 2 Players",
-                           fluidPage(sidebarLayout(position = "right",
+                           fluidPage(
+                          
+                             sidebarLayout(position = "right",
                                                    sidebarPanel(style = "background: black",
                                                                 wellPanel(style = "background: white",
                                                                          
@@ -109,9 +124,25 @@ ui <- navbarPage(inverse = TRUE,
                  # Last Page         
                  tabPanel("Age and Longevity", includeCSS("styles.css"),
                           fluidPage(h1("So... are WNBA and NBA PERs drastically different from each other?"))
-                          , plotOutput("longevity_plot"))
+                          , plotOutput("longevity_plot")),
+                 
+                 tabPanel("About", includeCSS("styles.css"),
+                          fluidPage( h3("This was an ",a("RLadies Atlanta",href="https://www.meetup.com/rladies-atlanta/","Talk")),
+                                        img(src="https://secure.meetupstatic.com/photos/event/e/9/4/5/highres_470519717.jpeg"),
+                            p("Ideas for the analysis came from ",a("Connie Lo", href = "https://www.linkedin.com/in/connielo")," and coding prepared by ",a("Sara Khan", href = "https://github.com/skhan890")),
+                                      br(),br(),br(),
+                                     p(strong("View the code on "),a("GitHub", href = "https://github.com/skhan890/RLadies_Hawks")),
+                                     p(strong("CSS styling code from "), a("committedtotape",href="https://committedtotape.shinyapps.io/sixtyninelovesongs")),
+                                     p(strong("R packages: "),"tidyverse, rvest, ggrepel, shiny."),
+                                     p(strong("Sources for data: "),"WNBA PER Data from ",
+a("Basketball-Reference", href="https://www.basketball-reference.com/"), "; WBNA Date of Births scraped from ", a("WikiPedia",
+                                                                                                       href = "https://www.wikipedia.org/"),
+                                      "; NBA PERs and Date of Births from Kaggle ",a("(drgilermo)",href="https://www.kaggle.com/drgilermo/nba-players-stats"))
+                                  
+                            )
                  )
 
+))
 
 
 server <- function(input, output) {
