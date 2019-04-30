@@ -95,7 +95,7 @@ ui <- tagList(
                           fluidPage(sidebarLayout(position = "right",
                                                   sidebarPanel(style = "background: black",
                                                                wellPanel(style = "background: white", 
-                                                                         h3("Standardizing PERs")
+                                                                         h3(strong("Standardizing PERs"))
                                                                          ),
                                                                wellPanel(style = "background: white",
                                                                          h4("Info:"),
@@ -119,12 +119,31 @@ ui <- tagList(
                  
                  )),
                  
-                 
+             # Second Page      
+             tabPanel("Age", includeCSS("styles.css"),
+                      fluidPage(sidebarLayout(position = "right",
+                                              sidebarPanel(style = "background: black",
+                                                           wellPanel(style = "background: white", 
+                                                                     h3(strong("Player age, length of NBA/WBNA career span and their PERs"))
+                                                           ),
+                                                           wellPanel(style = "background: white",
+                                                                     h4("Median PERs by Age:"),
+                                                                     p("This shows the median PER over time for all NBA and WNBA players. "),
+                                                                     p(em("Long Career = A player with more than 5 seasons playing for the NBA or WNBA"))
+                                              )),
+                                              mainPanel( 
+                                                plotOutput("longevity_plot", width="100%")
+                                                #,
+                                                #  visNetworkOutput("lovenetwork", width = "100%", height = "565px")
+                                              )
+                      )
+                      
+                      )),
                  
                  # Last Page         
-                 tabPanel("Age and Longevity", includeCSS("styles.css"),
-                          fluidPage(h1("So... are WNBA and NBA PERs drastically different from each other?"))
-                          , plotOutput("longevity_plot")),
+                 # tabPanel("Age and Longevity", includeCSS("styles.css"),
+                 #          fluidPage(h3("How does a player's age and their NBA/WBNA career span play into their PERs?"))
+                 #          , plotOutput("longevity_plot")),
                  
                  tabPanel("About", includeCSS("styles.css"),
                           fluidPage( h3("This was an ",a("RLadies Atlanta",href="https://www.meetup.com/rladies-atlanta/","Talk")),
@@ -204,21 +223,23 @@ server <- function(input, output) {
     
     median_age %>% 
       ggplot(aes(x=Age, y = median_age_PER)) +
-      geom_bar(stat="identity")+
+      geom_bar(stat="identity", aes(fill=class))+
       facet_wrap(career_length~class )+
-      scale_fill_identity() +
-      scale_colour_identity() +
+       scale_fill_manual("sth",values = c("WNBA"="#d8b365",
+                           "NBA" = "#17408B")) +
       labs(x = "Age in Years", y = "PER") +
       theme_minimal() +
       theme(#text = element_text(family = "Courier"),
+        legend.position = "none",
         panel.grid.minor.x = element_blank(),
         axis.line.x = element_line(colour = "red", size = 1),
         text = element_text(size=18),
         axis.text = element_text(size = 12),
         panel.grid.major.x = element_blank(),
         axis.ticks.x = element_line(),
-        plot.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "pt"),
-        strip.text = element_text(size=25))
+       # plot.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "pt"),
+        strip.text = element_text(size=25),
+        plot.margin = margin(10, 10, 10, 100))
   })
   
   
@@ -242,7 +263,7 @@ output$median_plot <- renderPlot({
       axis.ticks.x = element_line(),
       plot.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "pt"),
       strip.text = element_text(size=25))+
-    scale_x_continuous(breaks=c(1,5,10,15,17,20, 26))
+    scale_x_continuous(breaks=c(1,5,10,15,17,20, 27))
     
 })
 
