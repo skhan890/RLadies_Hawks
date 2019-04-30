@@ -5,19 +5,13 @@ library(dplyr)
 library(magrittr)
 library(data.table)
 
-# for(i in 1:16)
-# {
-#   float <- paste("squad", i, sep ="")
-#   print(float)
-#   html = read_html("https://en.wikipedia.org/wiki/UEFA_Euro_2012_squads")
-#   assign(float, html_table(html_nodes(html, "table")[[i]]))
-# }
+nba<-readxl::read_excel("data/nba.xlsx")
 
 players_info<-list()
 
-for(i in 1:nrow(sth3))
+for(i in 1:nrow(nba))
 {
-  float<-sth3[i,2]$URL
+  float<-nba[i,2]$URL
  # float <- paste("squad", i, sep ="")
  # print(float)
   html = read_html(paste0("https://en.wikipedia.org","/wiki/Jazmon_Gwathmey"))
@@ -69,8 +63,13 @@ saveRDS(players_info_all,"data/players_info_all.RDS")
 
 
 library(stringi)
+detach("package:dplyr", unload=TRUE)
+library(dplyr)
 
 wnba_dob<-players_info_all %>% 
+  # for some reason, "Bealton, VA" came in all the rows. Removing this
+  filter(!str_detect(PlayerInfo, "Bealeton")) %>% 
+  # only get the player information with "DOB"/Born information
   filter(Info=="Born") %>% rowwise() %>% 
   mutate(# extract the four digit Year of Birth for each player
     DOB_year = stri_sub(PlayerInfo, stri_locate_last_regex(PlayerInfo, "\\d{4}")),
@@ -79,4 +78,12 @@ wnba_dob<-players_info_all %>%
         # clean up the wiki name to remove the underscore ("_") to an empty space
          PlayerName2 = gsub("_"," ", PlayerName),
         # finally, make the name uppercase
-         PlayerName3 = toupper(PlayerName2)) %>% unique()
+    # desperate late night attempt - can use some work on making sure it's the exact same variable being overwritten
+         PlayerName3 = toupper(PlayerName2)) %>% unique() %>% 
+  # let's select only the year of birth and rename PlayerName to Player for easier merging later on
+  select(DOB_year, Player=PlayerName3) %>% unique() %>% 
+  group_by(Player) %>% 
+  # finally, join to the wnba.pers dataset
+  right_join(wnba.pers)
+
+

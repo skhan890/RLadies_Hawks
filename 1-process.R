@@ -85,8 +85,8 @@ wnba.pers<-do.call(rbind.data.frame, w_pers) %>% rownames_to_column() %>%
          Year=as.numeric(Year), # make Year numeric
          PER = as.numeric(PER))%>% #and convert PER numeric 
   # cleaning the data to remove the "Player" variable header
-  filter(!Player == "PLAYER")%>% group_by(Player, Year) %>% 
-  summarise(PER = median(PER))  
+  filter(!Player == "PLAYER")%>% dplyr::group_by(Player, Year) %>% 
+  dplyr::summarise(PER = median(PER))  
 
 ### years of data for WNBA players
 wnba.number_years<-wnba.pers %>% group_by(Player) %>% 
@@ -165,7 +165,5 @@ pers_year<-pers_year %>% group_by(Player) %>%
 saveRDS(pers_year, "pers_year.RDS")
 
 ### looking at it by conference ====
-
-nba<-readxl::read_excel("data/nba.xlsx")
 
 # age of retirement, vs agg PER when retired
