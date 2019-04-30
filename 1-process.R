@@ -88,6 +88,36 @@ wnba.pers<-do.call(rbind.data.frame, w_pers) %>% rownames_to_column() %>%
   filter(!Player == "PLAYER")%>% dplyr::group_by(Player, Year) %>% 
   dplyr::summarise(PER = median(PER))  
 
+
+library(stringi)
+detach("package:dplyr", unload=TRUE)
+library(dplyr)
+
+players_info_all<-readRDS("data/players_info_all.RDS")
+
+wnba.pers<-players_info_all %>% 
+  # for some reason, "Bealton, VA" came in all the rows. Removing this
+  filter(!str_detect(PlayerInfo, "Bealeton")) %>% 
+  # only get the player information with "DOB"/Born information
+  filter(Info=="Born") %>% rowwise() %>% 
+  mutate(# extract the four digit Year of Birth for each player
+    DOB_year = stri_sub(PlayerInfo, stri_locate_last_regex(PlayerInfo, "\\d{4}")),
+    # get the name from the wiki URL for each player
+    PlayerName = as.character(sub(".*/", "", Player)),
+    # clean up the wiki name to remove the underscore ("_") to an empty space
+    PlayerName2 = gsub("_"," ", PlayerName),
+    # finally, make the name uppercase
+    # desperate late night attempt - can use some work on making sure it's the exact same variable being overwritten
+    PlayerName3 = toupper(PlayerName2)) %>% unique() %>% 
+  # let's select only the year of birth and rename PlayerName to Player for easier merging later on
+  select(DOB_year, Player=PlayerName3) %>% unique() %>% 
+  group_by(Player) %>% 
+  # finally, join to the wnba.pers dataset
+  right_join(wnba.pers) %>% 
+  mutate(Age = ifelse(is.na(DOB_year),NA,
+                      Year - as.numeric(DOB_year)))
+
+
 ### years of data for WNBA players
 wnba.number_years<-wnba.pers %>% group_by(Player) %>% 
   summarise(number_of_PER_data_available = n()) %>% 
@@ -104,7 +134,7 @@ wnba.number_years<-wnba.pers %>% group_by(Player) %>%
 # only have WNBA players with at least 8 years of PER data
  wnba_pers_8<- wnba.pers %>%
    summarise(number_of_PER_data_available = n()) %>% 
-   filter(number_of_PER_data_available>3) %>% 
+   #filter(number_of_PER_data_available>3) %>% 
    # join back in the WNBA stats for PERs
    left_join(wnba.pers)
  
@@ -118,14 +148,18 @@ wnba.number_years<-wnba.pers %>% group_by(Player) %>%
  
  
  nba_pers<-read_csv("data/nba_pers.csv") %>% 
-   select(Year,Player,  PER) %>% 
-   # let's standardize the Player names by making them all caps
+   select(Year,Player, PER, Age) %>% unique() %>%  
    mutate(Player = toupper(Player),
-          Player = gsub("\\*", "", Player)) %>% 
+          Player = gsub("\\*", "", Player)) 
+ 
+ nba_pers<-nba_pers %>% 
+   # let's standardize the Player names by making them all caps
    # data cleaning: removing NA player names or missing PER
    filter(is.na(Player)==F,
-          is.na(PER)==F) %>% group_by(Player, Year) %>% 
-     summarise(PER = median(PER))  
+          is.na(PER)==F) %>% 
+      group_by(Player, Year) %>% 
+     summarise(PER = median(PER))  %>% 
+   left_join(nba_pers %>% select(Year, Player, Age) %>% unique())
  
  
  nba.number_years<-nba_pers %>% group_by(Player) %>% 
@@ -140,7 +174,7 @@ wnba.number_years<-wnba.pers %>% group_by(Player) %>%
  # only have NBA players with at least 8 years of PER data
 nba_pers_8<- nba_pers %>% group_by(Player, Year) %>% 
   summarise(PER = median(PER)) %>% 
-   summarise(number_of_PER_data_available = n()) %>% 
+  # summarise(number_of_PER_data_available = n()) %>% 
    filter(number_of_PER_data_available>3)%>% 
   # join back in the NBA stats for PERs
   left_join(nba_pers)
@@ -149,7 +183,9 @@ nba_pers_8<- nba_pers %>% group_by(Player, Year) %>%
 ##### join all datasets together =====
 
 pers_year <- nba_pers_8 %>% mutate(class = "NBA") %>% 
-  bind_rows(wnba_pers_8 %>% mutate(class = "WNBA"))
+  bind_rows(wnba_pers_8 %>% mutate(class = "WNBA")) %>%
+  # create a meaningful layer to show if a player has a long career or not
+  mutate(career_length = ifelse(number_of_PER_data_available>7, "Long Career", "Short Career")) 
 
 pers_year <- pers_year %>% 
   mutate(LastName =  str_extract(Player, '[^ ]+$'))
@@ -167,3 +203,13 @@ saveRDS(pers_year, "pers_year.RDS")
 ### looking at it by conference ====
 
 # age of retirement, vs agg PER when retired
+
+
+# 
+# table((wnba_dob %>% select(Player, DOB_year) %>% unique() %>% mutate(flag = ifelse(is.na(DOB_year),
+#                                                                                    "Missing DOB",
+#                                                                                    "Not missing DOB")))$flag)
+# 
+
+# majority are m.RDSissing
+# now majority are not missing!

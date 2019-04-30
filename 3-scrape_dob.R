@@ -85,35 +85,4 @@ players_info_all<-rbind(players_info2,
 saveRDS(players_info_all5,"data/players_info_all.RDS")
 players_info_all<-players_info_all5
 
-library(stringi)
-detach("package:dplyr", unload=TRUE)
-library(dplyr)
-
-wnba_dob<-players_info_all %>% 
-  # for some reason, "Bealton, VA" came in all the rows. Removing this
-  filter(!str_detect(PlayerInfo, "Bealeton")) %>% 
-  # only get the player information with "DOB"/Born information
-  filter(Info=="Born") %>% rowwise() %>% 
-  mutate(# extract the four digit Year of Birth for each player
-    DOB_year = stri_sub(PlayerInfo, stri_locate_last_regex(PlayerInfo, "\\d{4}")),
-        # get the name from the wiki URL for each player
-         PlayerName = as.character(sub(".*/", "", Player)),
-        # clean up the wiki name to remove the underscore ("_") to an empty space
-         PlayerName2 = gsub("_"," ", PlayerName),
-        # finally, make the name uppercase
-    # desperate late night attempt - can use some work on making sure it's the exact same variable being overwritten
-         PlayerName3 = toupper(PlayerName2)) %>% unique() %>% 
-  # let's select only the year of birth and rename PlayerName to Player for easier merging later on
-  select(DOB_year, Player=PlayerName3) %>% unique() %>% 
-  group_by(Player) %>% 
-  # finally, join to the wnba.pers dataset
-  right_join(wnba.pers) %>% 
-  mutate(Age = ifelse(is.na(DOB_year),NA,
-                      Year - as.numeric(DOB_year)))
-
-
-table((wnba_dob %>% select(Player, DOB_year) %>% unique() %>% mutate(flag = ifelse(is.na(DOB_year),
-                                                                                   "Missing DOB",
-                                                                                    "Not missing DOB")))$flag)
-# majority are missing
-# now majority are not missing!
+saveRDS(players_info_all5,"data/players_info_all.RDS")

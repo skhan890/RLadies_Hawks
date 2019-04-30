@@ -1,3 +1,4 @@
+.libPaths("C:/R/Rlibrary")
 library(shiny)
 # A Comparison of Player Efficiency Ratings (PERs) over time: trends from the 
 # Women's National Basketball Association (WNBA) 
@@ -13,19 +14,22 @@ library(shiny)
 # 1997 onwards
 
 library(tidyverse)
+library(ggrepel)
 
 pers_year<-read_rds("pers_year.RDS")
 
+pers_year_long<-pers_year %>%  filter(career_length == "Long Career")
+
 ## we only have from 1997 data, so I deleted all nba before that for this analysis
-pers_year %>% group_by(class) %>% 
+pers_year_long %>% group_by(class) %>% 
   mutate(lowest_year = min(Year)) %>% select(lowest_year, class) %>% unique()
 
-median_time<-pers_year %>% 
+median_time<-pers_year_long %>% 
   filter(Year > 1996) %>% 
   group_by(class, StandardYear) %>% 
   summarise(median_PER = median(PER))
 
-number_players<-pers_year %>% 
+number_players<-pers_year_long %>% 
   filter(Year > 1996) %>% 
   group_by(class) %>% select(Player) %>% unique() %>%  
   summarise(n=n())
@@ -44,14 +48,14 @@ ui <- navbarPage(inverse = TRUE,
                                                                                        #  HTML(tags$span(style="color:red", "Player 1:")),
                                                                                          
                                                                                         
-                                                                                      choices = unique(pers_year$Player),
+                                                                                      choices = unique(pers_year_long$Player),
                                                                                       selected = "DIANA TAURASI",
                                                                                       multiple = F),
                                                                           
                                                                           selectInput("player2",
                                                                                       HTML(paste(tags$span(style="color:#d8b365", "Player 2:"), sep = "")),
                                                                                       
-                                                                                      choices = unique(pers_year$Player),
+                                                                                      choices = unique(pers_year_long$Player),
                                                                                       selected = "MICHAEL JORDAN",
                                                                                       multiple = F)
                                                                           
@@ -105,7 +109,7 @@ ui <- navbarPage(inverse = TRUE,
                  # Last Page         
                  tabPanel("Age and Longevity", includeCSS("styles.css"),
                           fluidPage(h1("So... are WNBA and NBA PERs drastically different from each other?"))
-                          )
+                          , plotOutput("longevity_plot"))
                  )
 
 
@@ -117,8 +121,20 @@ server <- function(input, output) {
   pers_player_compare<-reactive({
     req(input$player1)
     req(input$player2)
-    pers_year  %>% 
+    
+    
+    pers_year_long2<- pers_year_long  %>% 
     filter(Player==input$player1 | Player==input$player2)
+    
+    pers_year_long2 %>% group_by(Player) %>% 
+      mutate(Max_Year = max(Year),
+             Min_Year = min(Year)) %>% 
+      mutate(Year = ifelse(Year == Max_Year,
+                           Max_Year,
+                           ifelse(Year == Min_Year,
+                           Min_Year, NA
+      )))
+    
   })
     
   output$persComparePlot <- renderPlot({  
@@ -139,7 +155,39 @@ server <- function(input, output) {
           panel.grid.major.x = element_blank(),
           axis.ticks.x = element_line(),
           plot.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "pt"))+
-      scale_x_continuous(breaks=min(pers_player_compare$StandardYear):max(pers_player_compare$StandardYear))
+      scale_x_continuous(breaks=min(pers_player_compare$StandardYear):max(pers_player_compare$StandardYear))+
+      geom_label_repel(aes(label = Year),
+                       nudge_x = 1,
+                       na.rm = TRUE)+
+      geom_label_repel(data= pers_player_compare %>% filter(Player == input$player2),
+                       aes(label = Year,
+                           color = "#d8b365"),
+                       nudge_x = 1,
+                       na.rm = TRUE)
+  })
+  
+  output$longevity_plot <- renderPlot({
+    
+    median_age<-pers_year %>% group_by(Age, class, career_length) %>% 
+      summarize(median_age_PER = median(PER))
+    
+    median_age %>% 
+      ggplot(aes(x=Age, y = median_age_PER)) +
+      geom_bar(stat="identity")+
+      facet_wrap(career_length~class )+
+      scale_fill_identity() +
+      scale_colour_identity() +
+      labs(x = "Age in Years", y = "PER") +
+      theme_minimal() +
+      theme(#text = element_text(family = "Courier"),
+        panel.grid.minor.x = element_blank(),
+        axis.line.x = element_line(colour = "red", size = 1),
+        text = element_text(size=18),
+        axis.text = element_text(size = 12),
+        panel.grid.major.x = element_blank(),
+        axis.ticks.x = element_line(),
+        plot.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "pt"),
+        strip.text = element_text(size=25))
   })
   
   
@@ -170,11 +218,11 @@ output$median_plot <- renderPlot({
   }
 # 
 # 
-# pers_year  %>% 
+# pers_year_long  %>% 
 #   filter(str_detect(Player, "MICHAEL JORD")) %>% 
 #   ggplot(aes(x=StandardYear, y = PER, color="red")) +
 #   geom_line()+
-#   geom_line(data= pers_year %>% filter(str_detect(Player, "TAURA")),
+#   geom_line(data= pers_year_long %>% filter(str_detect(Player, "TAURA")),
 #             aes(color="blue"))+
 #   scale_fill_identity() +
 #   scale_colour_identity() +
