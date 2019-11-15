@@ -195,7 +195,7 @@ knitr::include_graphics("pics/capture-dash.png")
 
 --
 
-<center>$$$$</center>
+$$$$$
 
 --
 
