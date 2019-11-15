@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>Sports Analytics and R Shiny</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Sara Khan" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
+    <link href="libs/remark-css/hygge.css" rel="stylesheet" />
+    <script src="libs/htmlwidgets/htmlwidgets.js"></script>
+    <script src="libs/jquery/jquery.min.js"></script>
+    <link href="libs/datatables-css/datatables-crosstalk.css" rel="stylesheet" />
+    <script src="libs/datatables-binding/datatables.js"></script>
+    <link href="libs/dt-core/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="libs/dt-core/css/jquery.dataTables.extra.css" rel="stylesheet" />
+    <script src="libs/dt-core/js/jquery.dataTables.min.js"></script>
+    <link href="libs/crosstalk/css/crosstalk.css" rel="stylesheet" />
+    <script src="libs/crosstalk/js/crosstalk.min.js"></script>
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Sports Analytics and R Shiny
+## Data Science for Scientists
+### Sara Khan
+### 2019/11/15
+
+---
+
+
+
+
+
+
+---
+# Who Am I?
+
+--
+
+- Masters in Public Health Informatics...
+
+--
+
+- Consultant at Gorman Consulting
+
+--
+
+- Adjunct at Rollins School of Public Health, Dept. of Biostatistics
+
+--
+
+- **Clearly not working in Sports Analytics**
+
+---
+class: inverse, center, middle
+
+# Why this talk?
+
+
+---
+
+# May 2019 
+
+
+Step back to May 2019. Invited as the **R Ladies of Atlanta** guest speaker for the Atlanta Hawks.
+
+
+
+&lt;img src="pics/hawks-talk.png" width="600px" /&gt;
+
+
+
+---
+
+
+# What is the **R Ladies of Atlanta** group?
+
+![https://rladies.org/](pics/rladies.png)
+
+
+*Mission statement:* The R community suffers from an underrepresentation of minority genders (including but not limited to cis/trans women, trans men, non-binary, genderqueer, agender) in every role and area of participation, whether as leaders, package developers, conference speakers, conference participants, educators, or users (see recent stats).
+
+As a diversity initiative, the mission of R-Ladies is to achieve proportionate representation by encouraging, inspiring, and empowering people of genders currently underrepresented in the R community. R-Ladies’ primary focus, therefore, is on supporting minority gender R enthusiasts to achieve their programming potential, by building a collaborative global network of R leaders, mentors, learners, and developers to facilitate individual and collective progress worldwide.
+
+---
+
+# R-Ladies directory
+
+World-wide organization - *280* chapters
+   
+
+
+<div id="htmlwidget-f1c5ff954b495e8831ce" style="width:100%;height:600px;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-f1c5ff954b495e8831ce">{"x":{"filter":"none","fillContainer":false,"data":[["1","2","3","4","5","6","7","8","9","10"],["South Africa","Taiwan","South Africa","USA","Brazil","USA","Brazil","USA","France","South Africa"],["","","","California","Piaui","Arkansas","Paraiba","Ohio","",""],["Johannesburg","Taipei","Cape Town","San Francisco","Teresina","Fayetteville","Campina Grande","Columbus","Montpellier","Durban"],["Active","Active","Active","Active","Prospective","Prospective","Prospective","Active","Active","Prospective"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Country<\/th>\n      <th>State.Region<\/th>\n      <th>City<\/th>\n      <th>Status<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":200,"dom":"ti","ordering":false,"order":[],"autoWidth":false,"orderClasses":false,"columnDefs":[{"orderable":false,"targets":0}],"lengthMenu":[10,25,50,100,200]}},"evals":[],"jsHooks":[]}</script>
+
+
+---
+class: inverse, center, middle
+
+# May 2019: ATL Hawks + R Ladies
+
+
+---
+
+# The dashboard
+
+
+https://skhan22.shinyapps.io/RLadies_Hawks/ 
+
+
+Made using R Shiny
+
+&lt;img src="pics/shiny-logo.png" width="400px" /&gt;
+
+
+---
+
+# What is in the dashboard?
+
+--
+
+- Extensible tool to compare standardized PERs across years and seasons contributed by players, regardless of years played or team (or gender-structured organization)
+
+&lt;br&gt;
+
+--
+
+- To analyze WNBA player scores with those in the NBA
+
+&lt;br&gt;
+
+--
+
+- To look at long career vs short career players
+
+&lt;br&gt;
+
+---
+
+# The data:
+
+Uses **Player Efficency Ratings** (PERs) 
+
+--
+
+What are PERs?
+
+--
+
+**PERs**: average contribution of a player for each season
+**Data source**: https://www.basketball-reference.com/
+
+&lt;img src="pics/capture-dash.png" width="400px" /&gt;
+
+
+
+---
+
+# What motivated incorporating WNBA?
+
+
+--
+
+1. RLadies!
+
+
+![https://rladies.org/](pics/rladies.png)
+
+--
+
+##**2. Not a lot of data on WNBA available online**
+
+- Had to manually scrape each data point (friend of a friend had done this previously) from _Wikipedia_
+
+- Lack of data analysis on WNBA
+
+--
+
+- Surprisingly, no comparison of PERs between NBA and WNBA players available online
+
+---
+
+# Differences between NBA and WNBA
+
+--
+
+&lt;center&gt;$$$$&lt;/center&gt;
+
+--
+
+
+- NBA **October - April** (7 months), 81 games
+
+- WNBA in season from **May - October** (4 months), 34 games
+
+--
+
+
+- To supplement, WNBA players will play overseas for 8 months
+
+&lt;center&gt;
+&lt;img src="pics/dream.png" width="350px" /&gt;
+
+&lt;img src="pics/dream2.png" width="350px" /&gt;
+
+&lt;/center&gt;
+
+
+---
+class: inverse, middle, center
+background-image: url(https://cdn11.bigcommerce.com/s-hii7479o/images/stencil/original/products/9917/26182/basketball__26234.1525718538.png?c=2)
+background-size: contain
+
+# Demo
+
+---
+
+class: inverse, middle, center
+
+# What about the mechanics?
+
+---
+
+# Shiny
+
+&lt;img src="pics/shiny-logo.png" width="200px" /&gt;
+
+
+- R package that lets you create interactive web applications
+
+- Integrates into R
+
+- Hosts on an RShiny Server
+  - Can host on your own
+  - Or use shinyapps.io
+
+- All free 
+
+---
+
+# What do you need to build a Shiny app?
+
+--
+
+- Latest version of R installed
+
+--
+
+- Latest version of RStudio
+
+--
+
+- Install the "shiny" package, like below
+
+
+```r
+install.packages("shiny")
+```
+
+--
+
+- Make a folder
+
+--
+
+  + Make a script called *ui.R*
+
+--
+
+  + Make a script called *server.R*
+
+---
+
+# ui.R
+
+
+```r
+library(shiny)
+
+shinyUI(fluidPage(
+      
+      # Enter the title of your app
+      titlePanel(),
+      
+      # side bar has 2 components
+       sidebarLayout(
+      
+         #1. Side bar panel
+          sidebarPanel(),
+      
+         #2. Main Panel
+           mainPanel()
+                    )
+                  )
+       )
+```
+
+---
+
+# server.R
+
+
+
+```r
+library(shiny)
+
+shinyServer(
+
+function(input, output){
+
+  # fancy stuff goes here
+                       }
+)
+```
+
+---
+
+# Example code from the dashboard
+
+From the UI
+
+
+```r
+sidebarLayout(position = "right",
+              sidebarPanel(style = "background: black",
+                           wellPanel(style = "background: white",
+                                     
+                                     selectizeInput("player1", 
+                                                    HTML(paste(tags$span(style="color:#5ab4ac", "Player 1:"), sep = "")),
+                                                    #  HTML(tags$span(style="color:red", "Player 1:")),
+                                                    
+                                                    
+                                                    choices = unique(pers_year_long$Player),
+                                                    selected = "DIANA TAURASI",
+                                                    multiple = F),
+                                     
+                                     selectInput("player2",
+                                                 HTML(paste(tags$span(style="color:#d8b365", "Player 2:"), sep = "")),
+                                                 
+                                                 choices = unique(pers_year_long$Player),
+                                                 selected = "MICHAEL JORDAN",
+                                                 multiple = F)
+                                     
+                           ))
+```
+
+---
+
+# More example code
+
+
+```r
+ output$persComparePlot &lt;- renderPlot({  
+    pers_player_compare&lt;-pers_player_compare()
+    pers_player_compare %&gt;% filter(Player == input$player1) %&gt;% 
+    ggplot(aes(x=StandardYear, y = PER, color="#5ab4ac")) +
+    geom_line(data= pers_player_compare %&gt;% filter(Player == input$player2),
+              aes(color="#d8b365"), size = 2)+
+    geom_line(size = 2)+
+    scale_fill_identity() +
+    scale_colour_identity() +
+    labs(x = "Year", y = "PER") +
+      scale_x_continuous(breaks=min(pers_player_compare$StandardYear):max(pers_player_compare$StandardYear))+
+      geom_label_repel(aes(label = Year),
+                       nudge_x = 1,
+                       na.rm = TRUE)+
+      geom_label_repel(data= pers_player_compare %&gt;% filter(Player == input$player2),
+                       aes(label = Year,
+                           color = "#d8b365"),
+                       nudge_x = 1,
+                       na.rm = TRUE)
+  })
+```
+
+
+---
+
+class: center, middle
+
+# All of the code is on GitHub
+
+
+
+https://github.com/skhan890/RLadies_Hawks/blob/master/app.R
+
+
+
+&lt;img src="pics/github.jpg" width="200px" /&gt;
+
+---
+
+class: inverse, center, middle
+
+# Thanks! 
+
+&lt;img src="pics/orb.gif" width="200px" /&gt;
+
+
+Any questions?
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
