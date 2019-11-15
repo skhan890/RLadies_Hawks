@@ -57,7 +57,7 @@ Step back to May 2019. Invited as the **R Ladies of Atlanta** guest speaker for 
 
 ```{r, echo=F, out.width = "600px"}
 
-knitr::include_graphics("pics/hawks-talk.PNG")
+knitr::include_graphics("pics/hawks-talk.png")
 
 ```
 
@@ -212,13 +212,13 @@ knitr::include_graphics("pics/capture-dash.png")
 <center>
 ```{r, echo=F, out.width = "350px"}
 
-knitr::include_graphics("pics/dream.PNG")
+knitr::include_graphics("pics/dream.png")
 
 ```
 
 ```{r, echo=F, out.width = "350px"}
 
-knitr::include_graphics("pics/dream2.PNG")
+knitr::include_graphics("pics/dream2.png")
 
 ```
 
@@ -418,4 +418,5 @@ knitr::include_graphics("pics/github.jpg")
 
 class: inverse, center, middle
 
-# Thanks! 😄 :Any questions?
+# Thanks!  Any questions?
+🙌 😃
